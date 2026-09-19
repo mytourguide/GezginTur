@@ -1,0 +1,15 @@
+# Gizli ortam dosyalari asla repoya girmez
+.env
+.env.local
+backend/.env
+frontend/.env.local
+
+# Derleme ciktilari
+backend/server
+backend/seed
+frontend/.next/
+frontend/node_modules/
+*.exe
+
+# Paket dosyalari
+go1.22.12.linux-amd64.tar.gz

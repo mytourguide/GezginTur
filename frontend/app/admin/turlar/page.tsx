@@ -23,7 +23,7 @@ export default function AdminToursPage() {
       <div className="bg-white border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-left">
-            <tr><th className="p-3">Tur</th><th className="p-3">Kategori</th><th className="p-3">Lokasyon</th><th className="p-3">Fiyat</th><th className="p-3">Durum</th><th className="p-3"></th></tr>
+            <tr><th className="p-3">Tur</th><th className="p-3">Kategori</th><th className="p-3">Lokasyon</th><th className="p-3">Fiyat</th><th className="p-3">Durum</th><th className="p-3">Anasayfa</th><th className="p-3"></th></tr>
           </thead>
           <tbody className="divide-y">
             {tours.map((t) => (
@@ -33,6 +33,7 @@ export default function AdminToursPage() {
                 <td className="p-3">{t.location}</td>
                 <td className="p-3">{formatPrice(t.base_price)}</td>
                 <td className="p-3">{t.active ? "Aktif" : "Pasif"}</td>
+                <td className="p-3">{t.featured ? <span className="text-brand-600 font-semibold" title={`Siralama: ${t.publish_order ?? 0}`}>★ (#{t.publish_order ?? 0})</span> : "-"}</td>
                 <td className="p-3"><a className="text-brand-600 hover:underline" href={`/admin/turlar/${t.id}`}>Duzenle</a></td>
               </tr>
             ))}

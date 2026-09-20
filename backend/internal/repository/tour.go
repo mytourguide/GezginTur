@@ -87,6 +87,10 @@ func (r *TourRepository) List(ctx context.Context, f TourFilters) ([]models.Tour
 	case "popular":
 		orderBy = "COALESCE(bk.cnt, 0) DESC"
 	}
+	// Anasayfa yayini: one cikanlar icin admin belirledigi siraya gore (buyuk once)
+	if f.Featured {
+		orderBy = "t.publish_order DESC, t.created_at DESC"
+	}
 
 	limit := f.Limit
 	if limit <= 0 {
@@ -110,7 +114,7 @@ func (r *TourRepository) List(ctx context.Context, f TourFilters) ([]models.Tour
 	rows, err := r.pool.Query(ctx, fmt.Sprintf(`
 		SELECT t.id, t.title, t.slug, t.description, t.category_id, c.name, t.cover_image,
 		       t.duration_days, t.duration_nights, t.location, t.base_price, t.currency,
-		       t.active, t.featured, t.created_at, COALESCE(bk.cnt,0),
+		       t.active, t.featured, t.publish_order, t.created_at, COALESCE(bk.cnt,0),
 		       COALESCE(t.title_en,''), COALESCE(t.slug_en,''),
 		       COALESCE(t.description_en,''), COALESCE(t.location_en,''),
 		       COALESCE(c.name_en,'')
@@ -129,7 +133,7 @@ func (r *TourRepository) List(ctx context.Context, f TourFilters) ([]models.Tour
 		var cnt int
 		if err := rows.Scan(&t.ID, &t.Title, &t.Slug, &t.Description, &t.CategoryID, &t.CategoryName,
 			&t.CoverImage, &t.DurationDays, &t.DurationNights, &t.Location, &t.BasePrice, &t.Currency,
-			&t.Active, &t.Featured, &t.CreatedAt, &cnt,
+			&t.Active, &t.Featured, &t.PublishOrder, &t.CreatedAt, &cnt,
 			&t.TitleEN, &t.SlugEN, &t.DescriptionEN, &t.LocationEN, &t.CategoryNameEN); err != nil {
 			return nil, 0, err
 		}
@@ -301,10 +305,10 @@ func (r *TourRepository) ListAdmin(ctx context.Context, search string) ([]models
 	rows, err := r.pool.Query(ctx, `
 		SELECT t.id, t.title, t.slug, t.description, t.category_id, c.name, t.cover_image,
 		       t.duration_days, t.duration_nights, t.location, t.base_price, t.currency,
-		       t.active, t.featured, t.created_at
+		       t.active, t.featured, t.publish_order, t.created_at
 		FROM tours t JOIN tour_categories c ON c.id = t.category_id
 		WHERE ($1 = '' OR t.title ILIKE '%'||$1||'%')
-		ORDER BY t.created_at DESC`, search)
+		ORDER BY t.featured DESC, t.publish_order DESC, t.created_at DESC`, search)
 	if err != nil {
 		return nil, err
 	}
@@ -314,7 +318,7 @@ func (r *TourRepository) ListAdmin(ctx context.Context, search string) ([]models
 		var t models.Tour
 		if err := rows.Scan(&t.ID, &t.Title, &t.Slug, &t.Description, &t.CategoryID, &t.CategoryName,
 			&t.CoverImage, &t.DurationDays, &t.DurationNights, &t.Location, &t.BasePrice, &t.Currency,
-			&t.Active, &t.Featured, &t.CreatedAt); err != nil {
+			&t.Active, &t.Featured, &t.PublishOrder, &t.CreatedAt); err != nil {
 			return nil, err
 		}
 		out = append(out, t)
@@ -327,11 +331,11 @@ func (r *TourRepository) GetByID(ctx context.Context, id string) (*models.Tour, 
 	err := r.pool.QueryRow(ctx, `
 		SELECT t.id, t.title, t.slug, t.description, t.category_id, c.name, t.cover_image,
 		       t.duration_days, t.duration_nights, t.location, t.base_price, t.currency,
-		       t.active, t.featured, t.created_at
+		       t.active, t.featured, t.publish_order, t.created_at
 		FROM tours t JOIN tour_categories c ON c.id = t.category_id WHERE t.id = $1`, id).
 		Scan(&t.ID, &t.Title, &t.Slug, &t.Description, &t.CategoryID, &t.CategoryName,
 			&t.CoverImage, &t.DurationDays, &t.DurationNights, &t.Location, &t.BasePrice,
-			&t.Currency, &t.Active, &t.Featured, &t.CreatedAt)
+			&t.Currency, &t.Active, &t.Featured, &t.PublishOrder, &t.CreatedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}
@@ -367,10 +371,10 @@ func (r *TourRepository) Create(ctx context.Context, in *models.AdminTourInput) 
 	var id string
 	err = tx.QueryRow(ctx, `
 		INSERT INTO tours (title, slug, description, category_id, cover_image, duration_days,
-			duration_nights, location, base_price, currency, active, featured)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING id`,
+			duration_nights, location, base_price, currency, active, featured, publish_order)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING id`,
 		in.Title, in.Slug, in.Description, in.CategoryID, in.CoverImage, in.DurationDays,
-		in.DurationNights, in.Location, in.BasePrice, in.Currency, in.Active, in.Featured).Scan(&id)
+		in.DurationNights, in.Location, in.BasePrice, in.Currency, in.Active, in.Featured, in.PublishOrder).Scan(&id)
 	if err != nil {
 		return "", err
 	}
@@ -395,9 +399,9 @@ func (r *TourRepository) Update(ctx context.Context, id string, in *models.Admin
 	_, err = tx.Exec(ctx, `
 		UPDATE tours SET title=$1, slug=$2, description=$3, category_id=$4, cover_image=$5,
 			duration_days=$6, duration_nights=$7, location=$8, base_price=$9, currency=$10,
-			active=$11, featured=$12, updated_at=now() WHERE id=$13`,
+			active=$11, featured=$12, publish_order=$13, updated_at=now() WHERE id=$14`,
 		in.Title, in.Slug, in.Description, in.CategoryID, in.CoverImage, in.DurationDays,
-		in.DurationNights, in.Location, in.BasePrice, in.Currency, in.Active, in.Featured, id)
+		in.DurationNights, in.Location, in.BasePrice, in.Currency, in.Active, in.Featured, in.PublishOrder, id)
 	if err != nil {
 		return err
 	}
@@ -469,5 +473,28 @@ func (r *TourRepository) CreateDeparture(ctx context.Context, tourID, startDate,
 
 func (r *TourRepository) DeleteDeparture(ctx context.Context, id string) error {
 	_, err := r.pool.Exec(ctx, `DELETE FROM tour_departures WHERE id=$1 AND filled = 0`, id)
+	return err
+}
+
+// GetSetting, ayar degerini dondurur; yoksa bos string.
+func (r *TourRepository) GetSetting(ctx context.Context, key string) (string, error) {
+	var v string
+	err := r.pool.QueryRow(ctx, `SELECT value FROM settings WHERE key=$1`, key).Scan(&v)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return "", nil
+	}
+	return v, err
+}
+
+// Query, saglik/ayar konularinda coklu satir okur.
+func (r *TourRepository) Query(ctx context.Context, sql string, args ...interface{}) (pgx.Rows, error) {
+	return r.pool.Query(ctx, sql, args...)
+}
+
+// SetSetting, ayar degerini yazar/gunceller.
+func (r *TourRepository) SetSetting(ctx context.Context, key, value string) error {
+	_, err := r.pool.Exec(ctx, `
+		INSERT INTO settings (key, value) VALUES ($1,$2)
+		ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value`, key, value)
 	return err
 }

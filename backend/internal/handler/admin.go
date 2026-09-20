@@ -329,3 +329,49 @@ func (a *API) AdminDeleteCoupon(w http.ResponseWriter, r *http.Request) {
 	}
 	JSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
+
+// ---------- Site ayarlari ----------
+
+// PublicSettings, giris gerektirmeyen yayin ayarlarini dondurur (anasayfa icin).
+func (a *API) PublicSettings(w http.ResponseWriter, r *http.Request) {
+	n, _ := a.Tours.GetSetting(r.Context(), "homepage_featured_count")
+	if n == "" {
+		n = "6"
+	}
+	JSON(w, http.StatusOK, map[string]string{"homepage_featured_count": n})
+}
+
+// AdminGetSettings, tum ayar satirlarini dondurur.
+func (a *API) AdminGetSettings(w http.ResponseWriter, r *http.Request) {
+	rows, err := a.Tours.Query(r.Context(), `SELECT key, value FROM settings ORDER BY key`)
+	if err != nil {
+		ErrorJSON(w, http.StatusInternalServerError, "ayarlar okunamadi")
+		return
+	}
+	defer rows.Close()
+	out := map[string]string{}
+	for rows.Next() {
+		var k, v string
+		if rows.Scan(&k, &v) == nil {
+			out[k] = v
+		}
+	}
+	JSON(w, http.StatusOK, out)
+}
+
+// AdminSetSetting, tek bir ayari yazar (key zorunlu).
+func (a *API) AdminSetSetting(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Key   string `json:"key"`
+		Value string `json:"value"`
+	}
+	if err := DecodeBody(r, &req); err != nil || req.Key == "" {
+		ErrorJSON(w, http.StatusBadRequest, "key ve value zorunlu")
+		return
+	}
+	if err := a.Tours.SetSetting(r.Context(), req.Key, req.Value); err != nil {
+		ErrorJSON(w, http.StatusInternalServerError, "ayar kaydedilemedi")
+		return
+	}
+	JSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}

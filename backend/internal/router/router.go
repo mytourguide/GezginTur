@@ -82,6 +82,7 @@ func New(cfg *config.Config, api *handler.API, tokens *service.TokenService) htt
 		r.Get("/tours", api.ListTours)
 		r.Get("/tours/{slug}", api.GetTour)
 		r.Get("/categories", api.ListCategories)
+		r.Get("/settings/public", api.PublicSettings) // anasayfa yayin ayarlari
 
 		// Odeme callback/webhook: iyzico sunuculari Bearer token gondermez, ayri tutulur
 		r.Post("/payments/callback", api.PaymentCallback)
@@ -106,6 +107,8 @@ func New(cfg *config.Config, api *handler.API, tokens *service.TokenService) htt
 
 			r.Get("/dashboard", api.AdminDashboard)
 			r.Get("/health", api.AdminHealth) // sistem sagligi kontrol paketi
+			r.Get("/settings", api.AdminGetSettings) // site ayarlari (anasayfa duzeni vb.)
+			r.Put("/settings", api.AdminSetSetting)
 
 			r.Get("/tours", api.AdminListTours)
 			r.Post("/tours", api.AdminCreateTour)

@@ -6,6 +6,39 @@ import { api } from "@/lib/api";
 import { formatPrice } from "@/components/TourCard";
 import type { DashboardStats, OccupancyRow, SalesPoint } from "@/lib/types";
 
+// Anasayfa "One Cikan Turlar" adedini admin panelinden ayarlar
+function HomepageSetting() {
+  const [count, setCount] = useState(6);
+  const [msg, setMsg] = useState("");
+
+  useEffect(() => {
+    api.get("/admin/settings", true).then((s) => {
+      if (s.homepage_featured_count) setCount(parseInt(s.homepage_featured_count, 10) || 6);
+    });
+  }, []);
+
+  async function save() {
+    setMsg("");
+    await api.put("/admin/settings", { key: "homepage_featured_count", value: String(count) }, true);
+    setMsg("Kaydedildi — anasayfada ilk " + count + " tur gosterilecek.");
+    setTimeout(() => setMsg(""), 3000);
+  }
+
+  return (
+    <div className="bg-white border rounded-xl p-4 mb-6">
+      <p className="font-semibold text-sm">Anasayfada Gosterilecek Tur Adedi</p>
+      <p className="text-xs text-gray-500 mt-0.5">"Anasayfada Yayinla" isaretli turlardan kac tanesi gorsun?</p>
+      <div className="flex items-center gap-3 mt-3">
+        <input type="number" min={1} max={50} value={count}
+          onChange={(e) => setCount(parseInt(e.target.value, 10) || 6)}
+          className="border rounded-lg px-3 py-2 w-24" />
+        <button onClick={save} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-700">Kaydet</button>
+        {msg && <span className="text-sm text-green-600">{msg}</span>}
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboardPage() {
   const [data, setData] = useState<{ stats: DashboardStats; sales: SalesPoint[]; occupancy: OccupancyRow[] } | null>(null);
 
@@ -37,6 +70,9 @@ export default function AdminDashboardPage() {
           <p className="text-2xl font-bold mt-1">{formatPrice(stats.total_revenue)}</p>
         </div>
       </div>
+
+      {/* Anasayfa yayin ayari: kac tur gosterilecegi */}
+      <HomepageSetting />
 
       {/* Gunluk satis grafigi (son 30 gun, SVG bar) */}
       <h2 className="font-bold mt-8 mb-3">Satis Grafigi (Son 30 Gun)</h2>

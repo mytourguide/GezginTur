@@ -23,11 +23,18 @@ const TXT = {
 
 async function getData() {
   // SSR: her istekte taze veri (SEO icin metadata layout'ta tanimli)
+  // Anasayfa adedi admin ayarlarindan okunur (varsayilan 6)
+  let limit = 6;
+  try {
+    const s = await fetch(apiUrl("/settings/public"), { cache: "no-store" }).then((r) => r.json());
+    const n = parseInt(s.homepage_featured_count, 10);
+    if (Number.isFinite(n) && n > 0) limit = n;
+  } catch { /* varsayilan kullanilir */ }
   const [featured, categories] = await Promise.all([
-    fetch(apiUrl("/tours?featured=true&limit=6"), { cache: "no-store" }).then((r) => r.json() as Promise<TourListResponse>),
+    fetch(apiUrl(`/tours?featured=true&limit=${limit}`), { cache: "no-store" }).then((r) => r.json() as Promise<TourListResponse>),
     fetch(apiUrl("/categories"), { cache: "no-store" }).then((r) => r.json() as Promise<Category[]>),
   ]);
-  return { featured: featured.tours ?? [], categories: categories ?? [] };
+  return { featured: featured.tours ?? [], categories: categories ?? [], limit };
 }
 
 export default async function HomePage() {

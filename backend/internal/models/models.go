@@ -95,7 +95,8 @@ type Tour struct {
 	BasePrice      float64   `json:"base_price"`
 	Currency       string    `json:"currency"`
 	Active         bool      `json:"active"`
-	Featured       bool      `json:"featured"`
+	Featured       bool      `json:"featured"`       // anasayfada yayinla
+	PublishOrder   int       `json:"publish_order"`  // anasayfa siralamasi (buyuk once)
 	CreatedAt      time.Time `json:"created_at"`
 
 	// Dil destegi: en cevirileri (JSON'a cikmaz; API katmani uygular)
@@ -251,6 +252,7 @@ type AdminTourInput struct {
 	Currency       string         `json:"currency"`
 	Active         bool           `json:"active"`
 	Featured       bool           `json:"featured"`
+	PublishOrder   int            `json:"publish_order"`
 	Images         []string       `json:"images"`
 	Included       []string       `json:"included"`
 	Excluded       []string       `json:"excluded"`

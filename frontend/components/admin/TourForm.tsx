@@ -22,6 +22,7 @@ export default function TourForm({ tour, categories }: { tour?: Tour; categories
     currency: tour?.currency ?? "TRY",
     active: tour?.active ?? true,
     featured: tour?.featured ?? false,
+    publish_order: tour?.publish_order ?? 0,
     images: tour?.images?.map((i) => i.image_url) ?? [],
     included: tour?.included?.map((i) => i.description) ?? [],
     excluded: tour?.excluded?.map((i) => i.description) ?? [],
@@ -109,9 +110,17 @@ export default function TourForm({ tour, categories }: { tour?: Tour; categories
           <input type="number" step="0.01" min={0} value={form.base_price} className={input}
             onChange={(e) => set("base_price", +e.target.value)} /> {form.currency} (taban fiyat)
         </label>
-        <label className="flex items-center gap-4 text-sm">
+        <label className="flex items-center gap-4 text-sm flex-wrap">
           <span><input type="checkbox" checked={form.active} onChange={(e) => set("active", e.target.checked)} /> Aktif</span>
-          <span><input type="checkbox" checked={form.featured} onChange={(e) => set("featured", e.target.checked)} /> One cikan</span>
+          <span><input type="checkbox" checked={form.featured} onChange={(e) => set("featured", e.target.checked)} /> Anasayfada Yayinla</span>
+          {form.featured && (
+            <span className="flex items-center gap-1">
+              Siralama:
+              <input type="number" value={form.publish_order} className={`${input} w-20`}
+                onChange={(e) => set("publish_order", +e.target.value)} />
+              <span className="text-gray-400">(buyuk sayi once gosterilir)</span>
+            </span>
+          )}
         </label>
       </section>
 

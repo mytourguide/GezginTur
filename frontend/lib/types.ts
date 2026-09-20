@@ -54,6 +54,7 @@ export interface Tour {
   currency: string;
   active: boolean;
   featured: boolean;
+  publish_order?: number;
   images?: TourImage[];
   departures?: Departure[];
   included?: TourItem[];

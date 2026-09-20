@@ -1,0 +1,34 @@
+# Render.com "Blueprint" — bu repoyu bagladiginizda otomatik servis + veritabani kurulur.
+# Render dashboard: New > Blueprint > repo sec > Apply.
+services:
+  - type: web
+    name: seyahat-api
+    runtime: go
+    rootDir: backend
+    buildCommand: go build -o server ./cmd/server
+    startCommand: ./server
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: seyahat-db
+          property: connectionString
+      - key: PUBLIC_BASE_URL
+        sync: false # Pages domaininiz kurulunca https://gezgin-tur.pages.dev yazin
+      - key: JWT_SECRET
+        generateValue: true
+      - key: IYZICO_API_KEY
+        sync: false
+      - key: IYZICO_SECRET_KEY
+        sync: false
+      - key: IYZICO_BASE_URL
+        value: https://sandbox-api.iyzipay.com
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: APPLE_SERVICE_ID
+        sync: false
+
+databases:
+  - name: seyahat-db
+    plan: free
+    postgresMajorVersion: 16

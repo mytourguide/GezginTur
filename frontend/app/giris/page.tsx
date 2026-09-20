@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { login } from "@/lib/auth";
 import SocialLoginButtons from "@/components/SocialLoginButtons";
 
-export default function LoginPage() {
+import { Suspense } from "react";
+
+function LoginForm() {
   const router = useRouter();
   const next = useSearchParams().get("next") || "/";
   const [email, setEmail] = useState("");
@@ -46,5 +48,14 @@ export default function LoginPage() {
         <SocialLoginButtons />
       </form>
     </div>
+  );
+}
+
+// useSearchParams Suspense sinirina muhtactir (prerender hatasi onlemi)
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="max-w-sm mx-auto px-4 py-16 text-gray-500">Yukleniyor...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

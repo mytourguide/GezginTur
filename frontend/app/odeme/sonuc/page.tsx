@@ -1,3 +1,5 @@
+// Cloudflare Pages (next-on-pages)
+export const runtime = "edge";
 // iyzico callback'i kullaniciyi buraya yonlendirir (?status=success|failed)
 import Link from "next/link";
 

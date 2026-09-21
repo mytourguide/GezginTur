@@ -3,6 +3,7 @@ export const runtime = "edge";
 import Image from "next/image";
 import type { Metadata } from "next";
 import BookingWidget from "@/components/BookingWidget";
+import { notFound } from "next/navigation";
 import type { Tour, TourImage } from "@/lib/types";
 import { apiUrl, getLang } from "@/lib/lang";
 
@@ -12,9 +13,23 @@ async function getTour(slug: string): Promise<Tour> {
   return res.json();
 }
 
+// API hatalarinda 500 yerine 404 sayfasina dus
+async function getTourSafe(slug: string): Promise<Tour> {
+  try {
+    return await getTour(slug);
+  } catch {
+    notFound();
+  }
+}
+
 // SEO: tur basligi/aciklamasi meta etiketlere islenir
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const tour = await getTour(params.slug);
+  let tour: Tour;
+  try {
+    tour = await getTour(params.slug);
+  } catch {
+    return { title: "Tur" }; // API ulasilamazsa genel baslik (500 yerine)
+  }
   return { title: tour.title, description: tour.description.slice(0, 160), openGraph: { images: [tour.cover_image] } };
 }
 
@@ -40,7 +55,7 @@ const TXT = {
 };
 
 export default async function TourDetailPage({ params }: { params: { slug: string } }) {
-  const tour = await getTour(params.slug);
+  const tour = await getTourSafe(params.slug);
   const lang = getLang();
   const txt = TXT[lang];
   const faqs = FAQS[lang];

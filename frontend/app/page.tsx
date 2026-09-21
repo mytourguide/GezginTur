@@ -32,11 +32,16 @@ async function getData() {
     const n = parseInt(s.homepage_featured_count, 10);
     if (Number.isFinite(n) && n > 0) limit = n;
   } catch { /* varsayilan kullanilir */ }
-  const [featured, categories] = await Promise.all([
-    fetch(apiUrl(`/tours?featured=true&limit=${limit}`), { cache: "no-store" }).then((r) => r.json() as Promise<TourListResponse>),
-    fetch(apiUrl("/categories"), { cache: "no-store" }).then((r) => r.json() as Promise<Category[]>),
-  ]);
-  return { featured: featured.tours ?? [], categories: categories ?? [], limit };
+  try {
+    const [featured, categories] = await Promise.all([
+      fetch(apiUrl(`/tours?featured=true&limit=${limit}`), { cache: "no-store" }).then((r) => r.json() as Promise<TourListResponse>),
+      fetch(apiUrl("/categories"), { cache: "no-store" }).then((r) => r.json() as Promise<Category[]>),
+    ]);
+    return { featured: featured.tours ?? [], categories: categories ?? [], limit };
+  } catch {
+    // API erisilemezse sayfa bos icerikle de render edilsin (500 yerine zarif dusus)
+    return { featured: [], categories: [], limit };
+  }
 }
 
 export default async function HomePage() {

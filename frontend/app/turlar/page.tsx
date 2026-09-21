@@ -14,7 +14,11 @@ const TXT = {
 // searchParams ile filtre/siralama (fiyat, tarih, sure, kategori)
 export default async function ToursPage({ searchParams }: { searchParams: Record<string, string> }) {
   const qs = new URLSearchParams(searchParams).toString();
-  const data: TourListResponse = await fetch(apiUrl(`/tours?${qs}`), { cache: "no-store" }).then((r) => r.json());
+  // API hatasi durumunda 500 yerine bos liste goster
+  let data: TourListResponse = { tours: [], total: 0, page: 1, limit: 0 };
+  try {
+    data = await fetch(apiUrl(`/tours?${qs}`), { cache: "no-store" }).then((r) => r.json());
+  } catch { /* API ulasilamazsa bos liste ile devam */ }
   const t = TXT[getLang()];
 
   return (

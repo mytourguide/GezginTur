@@ -16,3 +16,4 @@ go1.22.12.linux-amd64.tar.gz
 *.tsbuildinfo
 
 .github/
+.vercel

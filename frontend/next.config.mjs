@@ -2,8 +2,9 @@
 const nextConfig = {
   images: {
     remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
-    // Cloudflare Pages/Workers'da next/image optimizasyonu yok (CF_PAGES ortaminda devre disi)
-    unoptimized: !!process.env.CF_PAGES,
+    // Cloudflare Workers'da (OpenNext) next/image optimizasyonu desteklenmez;
+    // gorselleri oldugu gibi servis et (CDN zaten onbellekler)
+    unoptimized: true,
   },
   // Tarayici -> :8080 dogrudan istegini (CORS/pod sorunlari yasanabilir) atlatmak icin
   // arka uc cagirilari Next uzerinden proxy'lenir: /api/v1/* -> backend

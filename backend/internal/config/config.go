@@ -46,8 +46,15 @@ func env(key, def string) string {
 
 // Load, ortam degiskenlerini okuyup Config dondurur.
 func Load() *Config {
+	// Render gibi PaaS'ler PORT verir; ADDR tanimlanmamissa onu kullan
+	addr := env("ADDR", ":8080")
+	if os.Getenv("ADDR") == "" {
+		if p := os.Getenv("PORT"); p != "" {
+			addr = ":" + p
+		}
+	}
 	return &Config{
-		Addr:              env("ADDR", ":8080"),
+		Addr:              addr,
 		DatabaseURL:       env("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/seyahat?sslmode=disable"),
 		JWTSecret:         env("JWT_SECRET", "dev-secret-degistir"),
 		DataEncryptionKey: env("DATA_ENCRYPTION_KEY", ""),

@@ -1,5 +1,3 @@
-// Cloudflare Pages (next-on-pages) icin edge runtime zorunlu
-export const runtime = "edge";
 import TourCard from "@/components/TourCard";
 import type { TourListResponse } from "@/lib/types";
 import { apiUrl, getLang } from "@/lib/lang";

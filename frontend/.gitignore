@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+.vercel
+.open-next
+.wrangler
+*.log
+.env*
+!env.example
+next-env.d.ts

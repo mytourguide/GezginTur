@@ -1,7 +1,6 @@
 "use client";
 
 // Cloudflare Pages (next-on-pages)
-export const runtime = "edge";
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";

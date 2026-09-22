@@ -1,5 +1,3 @@
-// Cloudflare Pages (next-on-pages) icin edge runtime zorunlu
-export const runtime = "edge";
 import Image from "next/image";
 import type { Metadata } from "next";
 import BookingWidget from "@/components/BookingWidget";

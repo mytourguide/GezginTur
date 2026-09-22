@@ -9,5 +9,10 @@
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
+  },
+  // Runtime ortam degiskenleri (gizli olmayanlar). Sirlar icin: wrangler secret put
+  "vars": {
+    "NEXT_PUBLIC_API_URL": "https://seyahat-api.onrender.com/api/v1",
+    "API_INTERNAL_URL": "https://seyahat-api.onrender.com"
   }
 }

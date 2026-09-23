@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic"; // her istekte taze API verisi (CF Worker'da onbelleklenmesin)
 import Link from "next/link";
 import TourCard from "@/components/TourCard";
 import type { Category, TourListResponse } from "@/lib/types";
@@ -24,12 +25,12 @@ const TXT = {
 async function getData() {
   // SSR: her istekte taze veri (SEO icin metadata layout'ta tanimli)
   // Anasayfa adedi admin ayarlarindan okunur (varsayilan 6)
-  let limit = 6;
+  let limit = 21; // ayar okunamazsa tum turlar gosterilsin
   try {
     const s = await fetch(apiUrl("/settings/public"), { cache: "no-store" }).then((r) => r.json());
     const n = parseInt(s.homepage_featured_count, 10);
     if (Number.isFinite(n) && n > 0) limit = n;
-  } catch { /* varsayilan kullanilir */ }
+  } catch { /* varsayilan (21) kullanilir */ }
   try {
     const [featured, categories] = await Promise.all([
       fetch(apiUrl(`/tours?featured=true&limit=${limit}`), { cache: "no-store" }).then((r) => r.json() as Promise<TourListResponse>),

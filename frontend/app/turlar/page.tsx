@@ -11,7 +11,9 @@ const TXT = {
 
 // searchParams ile filtre/siralama (fiyat, tarih, sure, kategori)
 export default async function ToursPage({ searchParams }: { searchParams: Record<string, string> }) {
-  const qs = new URLSearchParams(searchParams).toString();
+  const sp = new URLSearchParams(searchParams);
+  if (!sp.has("limit")) sp.set("limit", "100"); // varsayilan sayfalama 12; tum turlari goster
+  const qs = sp.toString();
   // API hatasi durumunda 500 yerine bos liste goster
   let data: TourListResponse = { tours: [], total: 0, page: 1, limit: 0 };
   try {

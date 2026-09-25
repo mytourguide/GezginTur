@@ -30,13 +30,13 @@ export default function Footer() {
         </div>
         <div>
           <p className="font-bold text-gray-900 mb-2">{t.contact}</p>
-          <p>info@gezgintur.com</p>
-          <p>+90 212 000 00 00</p>
+          <p>mytourguide@gmail.com</p>
+          <p>0507 654 6712</p>
         </div>
         <div>
           <p className="font-bold text-gray-900 mb-2">{t.legal}</p>
-          <p>{t.legal1}</p>
-          <p>{t.legal2}</p>
+          <a href="/kvkk" className="hover:underline">{t.legal1}</a>
+          <a href="/mesafeli-satis" className="hover:underline block">{t.legal2}</a>
         </div>
       </div>
     </footer>

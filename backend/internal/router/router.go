@@ -40,6 +40,8 @@ func New(cfg *config.Config, api *handler.API, tokens *service.TokenService) htt
 			if allowed {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
 			}
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
 			// Preflight OPTIONS isteklerini burada kısa devre yap
 			if req.Method == http.MethodOptions {
 				w.WriteHeader(http.StatusNoContent)

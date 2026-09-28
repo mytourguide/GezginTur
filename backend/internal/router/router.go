@@ -29,16 +29,6 @@ func New(cfg *config.Config, api *handler.API, tokens *service.TokenService) htt
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(30 * time.Second))
-	// OPTIONS preflight handler
-	r.Use(func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.Method == http.MethodOptions {
-				w.WriteHeader(http.StatusNoContent)
-				return
-			}
-			next.ServeHTTP(w, req)
-		})
-	})
 	// CORS: Next.js gelistirme sunucusundan API'ye istek icin gerekli.
 	// PUBLIC_BASE_URL'e ek olarak localhost tabanli diger origin'lere (or. :3001) de izin ver.
 	r.Use(func(next http.Handler) http.Handler {
@@ -49,6 +39,11 @@ func New(cfg *config.Config, api *handler.API, tokens *service.TokenService) htt
 			w.Header().Set("Vary", "Origin")
 			if allowed {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
+			}
+			// Preflight OPTIONS isteklerini burada kısa devre yap
+			if req.Method == http.MethodOptions {
+				w.WriteHeader(http.StatusNoContent)
+				return
 			}
 			next.ServeHTTP(w, req)
 		})

@@ -55,8 +55,6 @@ func New(cfg *config.Config, api *handler.API, tokens *service.TokenService) htt
 	})
 	r.Use(chimw.SetHeader("Access-Control-Allow-Headers", "Content-Type, Authorization"))
 	r.Use(chimw.SetHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS"))
-	r.Method(http.MethodOptions, "/*", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusNoContent) }))
-	r.Method(http.MethodOptions, "/**", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusNoContent) }))
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Use(mw.RateLimit(120, time.Minute)) // genel API hiz sinirı

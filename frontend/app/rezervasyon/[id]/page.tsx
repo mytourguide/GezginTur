@@ -1,7 +1,5 @@
 "use client";
 
-export const runtime = 'edge';
-
 // Cloudflare Pages (next-on-pages)
 
 import { useEffect, useState } from "react";

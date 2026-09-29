@@ -1,4 +1,3 @@
-export const runtime = 'edge';
 export const dynamic = "force-dynamic"; // her istekte taze API verisi (CF Worker'da onbelleklenmesin)
 import Link from "next/link";
 import TourCard from "@/components/TourCard";

@@ -1,4 +1,5 @@
 export const runtime = 'edge';
+// build trigger 2026-09-29
 export const dynamic = "force-dynamic"; // her istekte taze API verisi (CF Worker'da onbelleklenmesin)
 import Link from "next/link";
 import TourCard from "@/components/TourCard";

@@ -8,8 +8,8 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useLang } from "@/lib/useLang";
 
 const NAV = {
-  tr: { tours: "Turlar", account: "Hesabim", admin: "Yonetim", logout: "Cikis", login: "Giris Yap", register: "Kayit Ol" },
-  en: { tours: "Tours", account: "My Account", admin: "Admin", logout: "Log Out", login: "Sign In", register: "Sign Up" },
+  tr: { brand: "Gezgin Tur", tours: "Turlar", account: "Hesabim", admin: "Yonetim", logout: "Cikis", login: "Giris Yap", register: "Kayit Ol" },
+  en: { brand: "Gezgin Tour", tours: "Tours", account: "My Account", admin: "Admin", logout: "Log Out", login: "Sign In", register: "Sign Up" },
 };
 
 export default function Navbar() {
@@ -21,7 +21,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b">
       <nav className="max-w-6xl mx-auto flex items-center justify-between px-4 h-16">
-        <Link href="/" className="text-xl font-bold text-brand-700">Gezgin Tur</Link>
+        <Link href="/" className="text-xl font-bold text-brand-700">{t.brand}</Link>
         <div className="flex items-center gap-5 text-sm font-medium">
           <Link href="/turlar" className="hover:text-brand-600">{t.tours}</Link>
           <LanguageSwitcher />

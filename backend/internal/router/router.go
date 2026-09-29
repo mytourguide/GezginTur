@@ -34,8 +34,22 @@ func New(cfg *config.Config, api *handler.API, tokens *service.TokenService) htt
 	r.Use(func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			origin := req.Header.Get("Origin")
-			allowed := origin == cfg.PublicBaseURL ||
-				(len(origin) > 0 && (hasHTTPPrefix(origin, "localhost:") || hasHTTPPrefix(origin, "127.0.0.1:")))
+			allowedOrigins := []string{
+				cfg.PublicBaseURL,
+				"https://mytourguide.com.tr",
+				"https://www.mytourguide.com.tr",
+				"https://seyahat-web.myturguide.workers.dev",
+			}
+			allowed := false
+			for _, o := range allowedOrigins {
+				if origin == o {
+					allowed = true
+					break
+				}
+			}
+			if !allowed && len(origin) > 0 && (hasHTTPPrefix(origin, "localhost:") || hasHTTPPrefix(origin, "127.0.0.1:")) {
+				allowed = true
+			}
 			w.Header().Set("Vary", "Origin")
 			if allowed {
 				w.Header().Set("Access-Control-Allow-Origin", origin)

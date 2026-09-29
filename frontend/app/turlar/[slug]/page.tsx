@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import Image from "next/image";
 import type { Metadata } from "next";
 import BookingWidget from "@/components/BookingWidget";

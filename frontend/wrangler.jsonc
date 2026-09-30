@@ -2,7 +2,7 @@
 // `npx @opennextjs/cloudflare build/deploy` bu dosyayi okur.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "gezginTur",
+  "name": "gezgintur",
   "account_id": "1e850537f63c205fc1c95e290359c50c",
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-09-01",
